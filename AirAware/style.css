@@ -1,0 +1,49 @@
+:root{--bg:#dde4e7;--card:#eef2f4;--ink:#1b2a33;--mute:#4c5f6b;--line:#b9c5cc;--aq:#f5c400;
+--display:'Bricolage Grotesque',system-ui,sans-serif;--body:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#10171b;--card:#192228;--ink:#e6eef2;--mute:#9db0bb;--line:#2e3d46}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.55;font-size:16px}
+main{max-width:860px;margin:0 auto;padding:20px 16px 56px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:20px}
+h1{font-family:var(--display);font-size:1.25rem;margin:0;font-weight:800}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+select,button{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
+button:hover,select:hover{border-color:var(--mute)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+label.sw{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:.95rem}
+label.sw input{width:18px;height:18px;accent-color:var(--ink)}
+.hero{background:var(--card);border:1px solid var(--line);border-left:10px solid var(--aq);border-radius:12px;padding:22px}
+.row{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end}
+.num{font-family:var(--display);font-weight:800;font-size:clamp(4.5rem,18vw,8rem);line-height:.9;letter-spacing:-.04em}
+.cat{font-family:var(--display);font-size:1.5rem;font-weight:600;margin:0}
+.sub{color:var(--mute);margin:2px 0 0;font-size:.95rem}
+.headline{font-family:var(--display);font-size:clamp(1.4rem,4.5vw,2rem);font-weight:800;line-height:1.15;margin:20px 0 6px;max-width:30ch}
+.scale{position:relative;display:flex;height:14px;border-radius:7px;overflow:hidden;margin:26px 0 6px}
+.scale i{display:block;height:100%}
+.pin{position:absolute;top:-6px;width:4px;height:26px;background:var(--ink);border-radius:2px;transform:translateX(-2px);box-shadow:0 0 0 2px var(--card)}
+.ticks{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mute)}
+h2{font-family:var(--display);font-size:1.2rem;margin:32px 0 10px;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px}
+.stat b{display:block;font-family:var(--display);font-size:1.4rem}
+.stat span{color:var(--mute);font-size:.85rem}
+.acts{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.acts li{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:14px 16px;border-top:1px solid var(--line)}
+.acts li:first-child{border-top:0}
+.acts .n{font-weight:600}
+.acts .r{grid-column:1;color:var(--mute);font-size:.9rem}
+.v{grid-row:1/3;grid-column:2;align-self:center;font-weight:600;font-size:.9rem;padding:4px 12px;border-radius:99px;border:2px solid}
+.v.go{border-color:#2e8b3d;color:#2e8b3d}.v.care{border-color:#b27d00;color:#b27d00}.v.skip{border-color:#c62828;color:#c62828}
+@media (prefers-color-scheme:dark){.v.go{color:#6fd47e;border-color:#6fd47e}.v.care{color:#f0c040;border-color:#f0c040}.v.skip{color:#ff7b7b;border-color:#ff7b7b}}
+.best{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.bars{display:flex;gap:6px;align-items:flex-end;height:150px;margin-top:14px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:.72rem;color:var(--mute);min-width:0}
+.bar div{width:100%;border-radius:4px 4px 0 0;min-height:6px}
+.bar.top span{color:var(--ink);font-weight:600}
+ul.tips{margin:0;padding-left:20px}
+ul.tips li{margin:6px 0}
+.msg{padding:28px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:12px}
+footer{margin-top:36px;color:var(--mute);font-size:.82rem}
+.hide{display:none}
+@media (prefers-reduced-motion:no-preference){.pin{transition:left .6s ease}}

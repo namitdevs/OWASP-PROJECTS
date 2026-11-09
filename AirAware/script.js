@@ -1,0 +1,184 @@
+(function(){
+"use strict";
+var PLACES=[
+ {n:"Central Delhi",la:28.6139,lo:77.2090},
+ {n:"North Delhi (Univ. area)",la:28.6889,lo:77.2105},
+ {n:"South Delhi",la:28.5355,lo:77.2100},
+ {n:"East Delhi (Mayur Vihar)",la:28.6090,lo:77.2970},
+ {n:"West Delhi (Dwarka)",la:28.5921,lo:77.0460},
+ {n:"Noida",la:28.5355,lo:77.3910},
+ {n:"Gurugram",la:28.4595,lo:77.0266}
+];
+var CATS=[
+ {max:50,name:"Good",col:"#00b050"},
+ {max:100,name:"Satisfactory",col:"#92d050"},
+ {max:200,name:"Moderate",col:"#f5c400"},
+ {max:300,name:"Poor",col:"#f57c00"},
+ {max:400,name:"Very poor",col:"#e53935"},
+ {max:9999,name:"Severe",col:"#8e1b3a"}
+];
+var PM25=[[0,30,0,50],[30,60,50,100],[60,90,100,200],[90,120,200,300],[120,250,300,400],[250,380,400,500]];
+var PM10=[[0,50,0,50],[50,100,50,100],[100,250,100,200],[250,350,200,300],[350,430,300,400],[430,600,400,500]];
+var $=function(id){return document.getElementById(id)};
+var data=null;
+
+function sub(c,bp){
+  for(var i=0;i<bp.length;i++){var b=bp[i];
+    if(c<=b[1]) return b[2]+(b[3]-b[2])*(Math.max(c,b[0])-b[0])/(b[1]-b[0]);}
+  return 500;
+}
+function iaqi(p25,p10){
+  var a=Number.isFinite(p25)?sub(p25,PM25):0, b=Number.isFinite(p10)?sub(p10,PM10):0;
+  return Math.round(Math.max(a,b));
+}
+function catOf(a){for(var i=0;i<CATS.length;i++) if(a<=CATS[i].max) return i; return CATS.length-1;}
+function hr(h){return (h%12||12)+(h<12?" am":" pm");}
+function hourOf(t){return parseInt(t.slice(11,13),10);}
+
+/* Activities: [name, goLimit, careLimit, strenuous] */
+var ACTS=[
+ ["Walking between blocks",150,250,false],
+ ["Outdoor class or lab",120,200,false],
+ ["Jogging or outdoor gym",80,150,true],
+ ["Cricket, football or ground practice",80,130,true]
+];
+
+function judge(a,feels,asthma){
+  var k=asthma?0.6:1, lvl=0, why=[];
+  var go=a[1]*k, care=a[2]*k;
+  if(data.aqi>care){lvl=2;why.push("AQI "+data.aqi+" is too high");}
+  else if(data.aqi>go){lvl=1;why.push("AQI "+data.aqi+" is above the comfortable limit");}
+  if(a[3]){
+    if(feels>=41){lvl=2;why.push("it feels like "+Math.round(feels)+"°C");}
+    else if(feels>=36){lvl=Math.max(lvl,1);why.push("it feels like "+Math.round(feels)+"°C");}
+  }
+  if(!why.length) why.push(asthma?"Air is fine for sensitive lungs right now":"Air and heat are fine right now");
+  return {lvl:lvl,why:why.join(" and ")};
+}
+
+function render(){
+  if(!data) return;
+  var asthma=$("asthma").checked;
+  var ci=catOf(data.aqi), cat=CATS[ci];
+  document.documentElement.style.setProperty("--aq",cat.col);
+  $("aqi").textContent=data.aqi;
+  $("cat").textContent=cat.name;
+  $("where").textContent=data.place;
+  $("upd").textContent="Updated "+data.time.slice(11,16)+" IST";
+  $("pin").style.left=Math.min(data.aqi,500)/5+"%";
+
+  var heat=data.feels>=41, hl, why;
+  if(heat){hl="Dangerous heat. Keep workouts indoors.";why="It feels like "+Math.round(data.feels)+"°C outside.";}
+  else if(ci<=1&&!(asthma&&ci===1)){hl="Good day to be outside.";why="Air quality is "+cat.name.toLowerCase()+". Normal activity is fine.";}
+  else if(ci<=2){hl=asthma?"Take it easy outside today.":"Fine for most. Go easy on hard workouts.";why="Air is "+cat.name.toLowerCase()+"."+(asthma?" Sensitive lungs should limit time outdoors.":"");}
+  else if(ci===3){hl="Skip the ground today. Use the indoor court.";why="Air is poor. Hard exercise outdoors makes you breathe in far more pollution.";}
+  else{hl="Stay indoors where you can.";why="Air is "+cat.name.toLowerCase()+". Even short walks affect sensitive people.";}
+  $("headline").textContent=hl;
+  $("why").textContent=why;
+
+  $("scale").querySelectorAll("i").forEach(function(n){n.remove();});
+  var widths=[10,10,20,20,20,20], frag=document.createDocumentFragment();
+  CATS.forEach(function(c,i){var s=document.createElement("i");s.style.width=widths[i]+"%";s.style.background=c.col;s.title=c.name;frag.appendChild(s);});
+  $("scale").insertBefore(frag,$("pin"));
+
+  var st=[["PM2.5",Math.round(data.p25)+" µg/m³"],["PM10",Math.round(data.p10)+" µg/m³"],
+    ["Temperature",Math.round(data.temp)+"°C"],["Feels like",Math.round(data.feels)+"°C"],
+    ["Humidity",Math.round(data.hum)+"%"],["Wind",Math.round(data.wind)+" km/h"]];
+  $("stats").innerHTML=st.map(function(s){return '<div class="stat"><b>'+s[1]+'</b><span>'+s[0]+'</span></div>';}).join("");
+
+  var rows=ACTS.map(function(a){var j=judge(a,data.feels,asthma);return {n:a[0],j:j};});
+  var ind=heat?{lvl:1,why:"Indoor courts and gyms are the safer choice. Keep windows closed on bad air days."}:{lvl:0,why:"Safe in any air. Indoor courts and gyms are always the better choice on smoggy days."};
+  rows.push({n:"Indoor court or gym",j:ind});
+  var lab=["Go","Take care","Skip"], cls=["go","care","skip"];
+  $("acts").innerHTML=rows.map(function(r,i){
+    var l=(i===rows.length-1)?0:r.j.lvl;
+    return '<li><span class="n">'+r.n+'</span><span class="v '+cls[l]+'">'+lab[l]+'</span><span class="r">'+r.j.why+'</span></li>';
+  }).join("");
+
+  var next=data.hours.slice(0,12), best=data.hours.slice(0,24).reduce(function(m,h){return h.a<m.a?h:m;});
+  var worst=Math.max.apply(null,next.map(function(h){return h.a;}));
+  $("bestline").innerHTML="<b>Cleanest hour in the next 24 hours: "+hr(hourOf(best.t))+"</b> (AQI "+best.a+"). Plan outdoor time then if you can.";
+  $("bars").innerHTML=next.map(function(h){
+    var c=CATS[catOf(h.a)].col, pct=Math.max(4,Math.min(h.a,500)/5);
+    return '<div class="bar'+(h.a===worst?" top":"")+'"><span>'+h.a+'</span><div style="height:'+pct+'%;background:'+c+'"></div><span>'+hr(hourOf(h.t)).replace(" ","")+'</span></div>';
+  }).join("");
+
+  var tips=[];
+  if(ci>=3) tips.push("Wear a fitted N95 or FFP2 mask outside. Cloth and surgical masks do little against fine dust.");
+  if(ci>=2) tips.push("Walk on inner, tree-lined paths and keep away from main roads and idling vehicles.");
+  if(ci>=2) tips.push("Move heavy workouts to the indoor court, gym or hostel, and keep windows closed during peak pollution hours.");
+  if(ci<=1) tips.push("Open your windows for a while now to air out your room.");
+  if(asthma) tips.push("Keep your inhaler with you and tell a friend where you are going.");
+  if(data.feels>=36) tips.push("Carry water and avoid the open ground between 12 pm and 4 pm.");
+  if(data.hum<30) tips.push("Dry air irritates the throat and eyes. Drink water often.");
+  tips.push("Check again before evening practice. Air quality can change a lot within a few hours.");
+  $("tips").innerHTML=tips.map(function(t){return "<li>"+t+"</li>";}).join("");
+
+  $("status").classList.add("hide");
+  $("app").classList.remove("hide");
+}
+
+function showError(msg){
+  $("app").classList.add("hide");
+  var s=$("status");s.classList.remove("hide");
+  s.innerHTML="";
+  var p=document.createElement("p");p.textContent=msg;s.appendChild(p);
+  var b=document.createElement("button");b.textContent="Try again";
+  b.onclick=function(){pick();};s.appendChild(b);
+}
+
+function load(la,lo,name){
+  var s=$("status");s.classList.remove("hide");s.textContent="Loading live air quality…";
+  $("app").classList.add("hide");
+  var aq="https://air-quality-api.open-meteo.com/v1/air-quality?latitude="+la+"&longitude="+lo+"&current=pm2_5,pm10&hourly=pm2_5,pm10&forecast_days=2&timezone=Asia%2FKolkata";
+  var wx="https://api.open-meteo.com/v1/forecast?latitude="+la+"&longitude="+lo+"&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m&timezone=Asia%2FKolkata";
+  Promise.all([fetch(aq),fetch(wx)]).then(function(rs){
+    if(!rs[0].ok||!rs[1].ok) throw new Error("bad response");
+    return Promise.all([rs[0].json(),rs[1].json()]);
+  }).then(function(j){
+    var a=j[0], w=j[1];
+    var p25=a.current.pm2_5, p10=a.current.pm10;
+    var key=a.current.time.slice(0,13)+":00", idx=a.hourly.time.indexOf(key);
+    if(idx<0) idx=0;
+    var hours=[];
+    for(var i=idx;i<a.hourly.time.length&&hours.length<24;i++){
+      var v25=a.hourly.pm2_5[i], v10=a.hourly.pm10[i];
+      if(v25==null&&v10==null) continue;
+      hours.push({t:a.hourly.time[i],a:iaqi(v25,v10)});
+    }
+    if(!hours.length||p25==null) throw new Error("no data");
+    data={place:name,time:a.current.time,p25:p25,p10:p10==null?0:p10,aqi:iaqi(p25,p10),
+      temp:w.current.temperature_2m,feels:w.current.apparent_temperature,
+      hum:w.current.relative_humidity_2m,wind:w.current.wind_speed_10m,hours:hours};
+    render();
+  }).catch(function(){
+    showError("Couldn’t load live air quality. Check your internet connection and try again.");
+  });
+}
+
+function pick(){
+  var v=$("place").value;
+  try{localStorage.setItem("aac-place",v);}catch(e){}
+  if(v==="gps"){
+    if(!navigator.geolocation){showError("Your browser doesn’t support location. Choose an area from the list.");return;}
+    navigator.geolocation.getCurrentPosition(function(p){
+      load(p.coords.latitude.toFixed(4),p.coords.longitude.toFixed(4),"Your location");
+    },function(){showError("Location access was blocked. Allow it in your browser or choose an area from the list.");},{timeout:10000});
+    return;
+  }
+  var p=PLACES[parseInt(v,10)]||PLACES[0];
+  load(p.la,p.lo,p.n);
+}
+
+var sel=$("place");
+PLACES.forEach(function(p,i){var o=document.createElement("option");o.value=i;o.textContent=p.n;sel.appendChild(o);});
+var g=document.createElement("option");g.value="gps";g.textContent="Use my location";sel.appendChild(g);
+try{var saved=localStorage.getItem("aac-place");if(saved&&sel.querySelector('option[value="'+saved+'"]'))sel.value=saved;}catch(e){}
+sel.addEventListener("change",pick);
+$("asthma").addEventListener("change",function(){
+  try{localStorage.setItem("aac-asthma",this.checked?"1":"0");}catch(e){}
+  render();
+});
+try{if(localStorage.getItem("aac-asthma")==="1")$("asthma").checked=true;}catch(e){}
+pick();
+})();
