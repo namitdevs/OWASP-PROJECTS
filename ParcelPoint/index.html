@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ParcelPoint – Hostel parcel &amp; courier tracker</title>
+<meta name="description" content="Log hostel parcels at the gate, notify students instantly, and hand over with a pickup code. No more 'did my parcel come?'">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">📦</span>
+    <div><b>ParcelPoint</b><small>Hostel parcel &amp; courier tracker</small></div>
+  </div>
+  <nav class="roles" role="tablist" aria-label="Choose your role">
+    <button role="tab" class="tab" data-role="student" aria-selected="true">🎓 Student <span id="badge" class="badge hide">0</span></button>
+    <button role="tab" class="tab" data-role="desk" aria-selected="false">🛎️ Parcel desk</button>
+  </nav>
+</header>
+
+<main>
+<noscript><p class="card">ParcelPoint needs JavaScript to run. Please enable it.</p></noscript>
+
+<!-- ================= STUDENT ================= -->
+<section id="view-student" class="view">
+  <div class="card">
+    <h2>Your details</h2>
+    <form id="profileForm" class="fields two" autocomplete="off">
+      <label>Full name<input id="pName" required maxlength="60" placeholder="e.g. Rohan Mehta"></label>
+      <label>Roll number<input id="pRoll" required maxlength="20" placeholder="e.g. 2301CS045"></label>
+      <label>Room<input id="pRoom" required maxlength="12" placeholder="e.g. B-214"></label>
+      <label>Phone (10 digits)<input id="pPhone" required inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="9876543210"></label>
+      <button class="btn primary" type="submit">Save details</button>
+    </form>
+  </div>
+
+  <div id="needProfile" class="note-box">Save your details above to see your parcels.</div>
+
+  <div id="studentMain" class="hide">
+    <div id="waitBanner"></div>
+    <h2 class="sec">Waiting for pickup</h2>
+    <div id="waitList" class="list"></div>
+
+    <h2 class="sec">Expecting a parcel?</h2>
+    <div class="card">
+      <p class="hint">Tell us what is coming. When it reaches the gate, it is matched to you automatically.</p>
+      <form id="expForm" class="fields" autocomplete="off">
+        <div class="two">
+          <label>Courier<select id="eCourier"></select></label>
+          <label>Item (optional)<input id="eItem" maxlength="60" placeholder="e.g. Headphones"></label>
+        </div>
+        <label>Tracking / AWB number (optional)<input id="eAwb" maxlength="30" placeholder="e.g. 1234567890"></label>
+        <button class="btn primary" type="submit">Add to expected</button>
+      </form>
+    </div>
+    <div id="expList" class="list slim"></div>
+
+    <h2 class="sec">Past parcels</h2>
+    <div id="pastList" class="list"></div>
+  </div>
+</section>
+
+<!-- ================= DESK ================= -->
+<section id="view-desk" class="view hide">
+  <div id="deskLock" class="card lockbox">
+    <h2>Parcel desk login</h2>
+    <p>Enter the desk PIN to log and hand over parcels.</p>
+    <form class="lock" id="lockForm">
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Desk PIN" required>
+      <button class="btn primary" type="submit">Unlock</button>
+    </form>
+    <p class="hint">Demo PIN: 2468</p>
+    <p id="lockErr" class="err hide" role="alert"></p>
+  </div>
+
+  <div id="deskMain" class="hide">
+    <div class="stats">
+      <div class="stat"><b id="sWait">0</b><span>Waiting</span></div>
+      <div class="stat warn"><b id="sAging">0</b><span>3+ days old</span></div>
+      <div class="stat"><b id="sToday">0</b><span>Collected today</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Quick pickup</h2>
+      <form id="codeForm" class="inline">
+        <input id="codeInput" placeholder="PK-XXXXX" maxlength="10" autocapitalize="characters" autocomplete="off" aria-label="Pickup code" required>
+        <button class="btn primary" type="submit">Find parcel</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Log a new parcel</h2>
+      <form id="logForm" class="fields" autocomplete="off">
+        <div class="two">
+          <label>Roll number<input id="lRoll" list="rollList" required maxlength="20" placeholder="Start typing roll no."></label>
+          <label>Student name<input id="lName" required maxlength="60"></label>
+        </div>
+        <datalist id="rollList"></datalist>
+        <div class="two">
+          <label>Room<input id="lRoom" maxlength="12" placeholder="e.g. B-214"></label>
+          <label>Phone (for WhatsApp alert)<input id="lPhone" inputmode="numeric" maxlength="10" placeholder="10 digits"></label>
+        </div>
+        <div class="two">
+          <label>Courier<select id="lCourier"></select></label>
+          <label>Size
+            <select id="lSize"><option>Small</option><option>Medium</option><option>Large</option></select>
+          </label>
+        </div>
+        <div class="two">
+          <label>Item / note (optional)<input id="lItem" maxlength="60" placeholder="e.g. Brown box, Amazon"></label>
+          <label>Tracking / AWB (optional)<input id="lAwb" maxlength="30"></label>
+        </div>
+        <div class="two">
+          <label>Shelf<input id="lShelf" maxlength="10" required></label>
+          <label>Cash on delivery ₹ (0 if none)<input id="lCod" type="number" min="0" max="100000" step="1" value="0"></label>
+        </div>
+        <label class="check"><input type="checkbox" id="lFragile"> Fragile – handle with care</label>
+        <p id="logErr" class="err hide" role="alert"></p>
+        <button class="btn primary" type="submit">Log parcel &amp; generate code</button>
+      </form>
+      <div id="logResult"></div>
+    </div>
+
+    <h2 class="sec">Parcels</h2>
+    <div class="chips">
+      <button class="chip-btn active" data-filter="waiting">Waiting</button>
+      <button class="chip-btn" data-filter="aging">3+ days</button>
+      <button class="chip-btn" data-filter="done">Collected / returned</button>
+    </div>
+    <input id="search" class="search" type="search" placeholder="Search name, roll, code, courier, AWB…" aria-label="Search parcels">
+    <div id="deskList" class="list"></div>
+  </div>
+</section>
+</main>
+
+<dialog id="hoDialog" aria-label="Hand over parcel">
+  <div id="hoBody"></div>
+</dialog>
+
+<div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+
+<footer>
+  <p>Parcels are stored in this browser for the demo. For real use across the desk computer and students’ phones, connect the <code>Store</code> functions in <code>script.js</code> to Firebase or Supabase.</p>
+  <p><button class="link" id="seedBtn" type="button">Load sample data</button> · <button class="link" id="resetBtn" type="button">Clear all data</button></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
