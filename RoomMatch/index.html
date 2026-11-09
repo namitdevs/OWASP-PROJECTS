@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RoomMatch – Find a roommate you’ll actually get along with</title>
+<meta name="description" content="A short lifestyle quiz matches hostel students with compatible roommates. Fewer room conflicts, happier hostels.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤝</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">🤝</span>
+    <div><b>RoomMatch</b><small>Find your hostel roommate</small></div>
+  </div>
+  <nav class="roles" role="tablist" aria-label="Choose your role">
+    <button role="tab" class="tab" data-role="student" aria-selected="true">🎓 Student</button>
+    <button role="tab" class="tab" data-role="warden" aria-selected="false">🧑‍💼 Warden</button>
+  </nav>
+</header>
+
+<main>
+<noscript><p class="card">RoomMatch needs JavaScript to run. Please enable it.</p></noscript>
+
+<!-- ================= STUDENT ================= -->
+<section id="view-student" class="view">
+  <div id="signin" class="card">
+    <h2>Welcome</h2>
+    <p class="hint">Take a 2-minute quiz and we’ll find people whose habits fit yours. Already took it? Continue as:</p>
+    <div class="inline">
+      <select id="signSel" aria-label="Continue as"></select>
+      <button class="btn ghost" id="signBtn" type="button">Continue</button>
+    </div>
+  </div>
+
+  <div id="dash" class="hide">
+    <div id="meCard"></div>
+    <nav class="subtabs" aria-label="Sections">
+      <button class="sub active" data-sub="matches">Matches</button>
+      <button class="sub" data-sub="requests">Requests <span id="reqBadge" class="badge hide">0</span></button>
+      <button class="sub" data-sub="profile">My quiz</button>
+    </nav>
+    <div id="paneMatches" class="list"></div>
+    <div id="paneRequests" class="hide"></div>
+  </div>
+
+  <div id="profileSection" class="card">
+    <h2 id="profTitle">Create your profile</h2>
+    <form id="profForm" autocomplete="off">
+      <div class="fields two">
+        <label>Full name<input id="pName" required maxlength="60" placeholder="e.g. Rohan Mehta"></label>
+        <label>Roll number<input id="pRoll" required maxlength="20" placeholder="e.g. 2301CS045"></label>
+        <label>Hostel<select id="pHostel"></select></label>
+        <label>Year<select id="pYear"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+        <label>Branch (optional)<input id="pBranch" maxlength="30" placeholder="e.g. CSE"></label>
+        <label>A line about you (optional)<input id="pAbout" maxlength="100" placeholder="e.g. Gym at 6 am, loves chai"></label>
+      </div>
+      <h3 class="qhead">Your lifestyle</h3>
+      <p class="hint">Be honest. A match only works if the answers are real. Tick <b>Dealbreaker</b> on anything you cannot compromise on.</p>
+      <div id="quiz"></div>
+      <p id="profErr" class="err hide" role="alert"></p>
+      <button class="btn primary wide" type="submit" id="profSave">Save &amp; find my matches</button>
+    </form>
+  </div>
+</section>
+
+<!-- ================= WARDEN ================= -->
+<section id="view-warden" class="view hide">
+  <div id="wardenLock" class="card lockbox">
+    <h2>Warden login</h2>
+    <p>Enter the warden PIN to manage room pairs.</p>
+    <form class="lock" id="lockForm">
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Warden PIN" required>
+      <button class="btn primary" type="submit">Unlock</button>
+    </form>
+    <p class="hint">Demo PIN: 1357</p>
+    <p id="lockErr" class="err hide" role="alert"></p>
+  </div>
+
+  <div id="wardenMain" class="hide">
+    <div class="stats">
+      <div class="stat"><b id="sLooking">0</b><span>Looking</span></div>
+      <div class="stat"><b id="sPairs">0</b><span>Pairs</span></div>
+      <div class="stat"><b id="sReq">0</b><span>Open requests</span></div>
+    </div>
+
+    <h2 class="sec">Suggested pairs</h2>
+    <p class="hint">Best compatible pairs among students who are still looking (same hostel, no dealbreaker clashes).</p>
+    <div id="suggestList" class="list"></div>
+
+    <div class="rowhead"><h2 class="sec">Confirmed pairs</h2><button class="btn ghost small" id="csvBtn" type="button">⬇ Download CSV</button></div>
+    <div id="pairList" class="list"></div>
+
+    <h2 class="sec">Still looking</h2>
+    <div id="lookList" class="list"></div>
+  </div>
+</section>
+</main>
+
+<div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+
+<footer>
+  <p>Profiles are stored in this browser for the demo. For real use across students’ phones, connect the <code>Store</code> functions in <code>script.js</code> to Firebase or Supabase. Match scores are a guide, not a rule.</p>
+  <p><button class="link" id="seedBtn" type="button">Load sample students</button> · <button class="link" id="resetBtn" type="button">Clear all data</button></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

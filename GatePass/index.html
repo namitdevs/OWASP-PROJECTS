@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GatePass – Digital hostel outpass &amp; late entry</title>
+<meta name="description" content="Request, approve and verify hostel outpasses with QR codes. Built for students, wardens and gate guards.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛂</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">🛂</span>
+    <div><b>GatePass</b><small>Hostel outpass &amp; late entry</small></div>
+  </div>
+  <nav class="roles" role="tablist" aria-label="Choose your role">
+    <button role="tab" class="tab" data-role="student" aria-selected="true">🎓 Student</button>
+    <button role="tab" class="tab" data-role="warden" aria-selected="false">🧑‍💼 Warden</button>
+    <button role="tab" class="tab" data-role="guard" aria-selected="false">💂 Guard</button>
+  </nav>
+</header>
+
+<main>
+<noscript><p class="card">GatePass needs JavaScript to run. Please enable it.</p></noscript>
+
+<!-- ================= STUDENT ================= -->
+<section id="view-student" class="view">
+  <div class="card">
+    <h2>Your details</h2>
+    <form id="profileForm" class="fields two" autocomplete="off">
+      <label>Full name<input id="pName" required maxlength="60" placeholder="e.g. Rohan Mehta"></label>
+      <label>Roll number<input id="pRoll" required maxlength="20" placeholder="e.g. 2301CS045"></label>
+      <label>Room<input id="pRoom" required maxlength="12" placeholder="e.g. B-214"></label>
+      <label>Parent phone (10 digits)<input id="pPhone" required inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="9876543210"></label>
+      <button class="btn primary" type="submit">Save details</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>New pass request</h2>
+    <p id="reqLock" class="note-box">Save your details above to request a pass.</p>
+    <form id="reqForm" class="fields" autocomplete="off">
+      <label>Pass type
+        <select id="rType">
+          <option>Day outpass</option>
+          <option>Late return (after curfew)</option>
+          <option>Night out</option>
+          <option>Home leave</option>
+        </select>
+      </label>
+      <label>Destination<input id="rDest" required maxlength="80" placeholder="e.g. Connaught Place, Home – Gurugram"></label>
+      <label>Reason<textarea id="rReason" required maxlength="200" rows="2" placeholder="e.g. Buying books, family function"></textarea></label>
+      <div class="two">
+        <label>Going out<input type="datetime-local" id="rOut" required></label>
+        <label>Back by<input type="datetime-local" id="rReturn" required></label>
+      </div>
+      <p id="curfewHint" class="hint hide"></p>
+      <p id="formErr" class="err hide" role="alert"></p>
+      <button class="btn primary" type="submit">Send request to warden</button>
+    </form>
+  </div>
+
+  <h2 class="sec">My passes</h2>
+  <div id="myPasses" class="list"></div>
+</section>
+
+<!-- ================= WARDEN ================= -->
+<section id="view-warden" class="view hide">
+  <div id="wardenLock" class="card lockbox">
+    <h2>Warden login</h2>
+    <p>Enter the warden PIN to review requests.</p>
+    <form class="lock" data-lock="warden">
+      <input type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Warden PIN" required>
+      <button class="btn primary" type="submit">Unlock</button>
+    </form>
+    <p class="hint">Demo PIN: 1234</p>
+    <p class="err hide" role="alert"></p>
+  </div>
+  <div id="wardenMain" class="hide">
+    <div class="stats">
+      <div class="stat"><b id="sPending">0</b><span>Pending</span></div>
+      <div class="stat"><b id="sOut">0</b><span>Out now</span></div>
+      <div class="stat warn"><b id="sOverdue">0</b><span>Overdue</span></div>
+    </div>
+    <div class="chips" role="tablist" aria-label="Filter passes">
+      <button class="chip-btn active" data-filter="pending">Pending</button>
+      <button class="chip-btn" data-filter="out">Out now</button>
+      <button class="chip-btn" data-filter="history">History</button>
+    </div>
+    <div id="wardenList" class="list"></div>
+  </div>
+</section>
+
+<!-- ================= GUARD ================= -->
+<section id="view-guard" class="view hide">
+  <div id="guardLock" class="card lockbox">
+    <h2>Gate guard login</h2>
+    <p>Enter the guard PIN to verify passes.</p>
+    <form class="lock" data-lock="guard">
+      <input type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Guard PIN" required>
+      <button class="btn primary" type="submit">Unlock</button>
+    </form>
+    <p class="hint">Demo PIN: 4321</p>
+    <p class="err hide" role="alert"></p>
+  </div>
+  <div id="guardMain" class="hide">
+    <div class="card">
+      <h2>Verify a pass</h2>
+      <form id="verifyForm" class="verify">
+        <input id="codeInput" placeholder="GP-XXXXXX" maxlength="12" autocapitalize="characters" autocomplete="off" aria-label="Pass code" required>
+        <button class="btn primary" type="submit">Verify</button>
+        <button class="btn ghost" type="button" id="scanBtn">📷 Scan QR</button>
+      </form>
+      <div id="scanBox" class="scanbox hide">
+        <video id="scanVideo" muted playsinline></video>
+        <canvas id="scanCanvas" class="hide"></canvas>
+        <button class="btn ghost" type="button" id="stopScan">Stop camera</button>
+      </div>
+      <div id="verifyResult"></div>
+    </div>
+    <h2 class="sec">Currently out of hostel</h2>
+    <div id="outList" class="list"></div>
+    <h2 class="sec">Recent gate movements</h2>
+    <ul id="moveLog" class="log"></ul>
+  </div>
+</section>
+</main>
+
+<dialog id="qrDialog" aria-label="Your gate pass">
+  <div id="qrBody"></div>
+  <form method="dialog"><button class="btn primary wide">Close</button></form>
+</dialog>
+
+<div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+
+<footer>
+  <p>Passes are stored in this browser for the demo. For real use across phones, connect the storage functions in <code>script.js</code> to Firebase or Supabase.</p>
+  <p><button class="link" id="seedBtn" type="button">Load sample data</button> · <button class="link" id="resetBtn" type="button">Clear all data</button></p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

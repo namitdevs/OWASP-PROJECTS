@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RoomSwap – Hostel room-change swaps, 2-way and 3-way</title>
+<meta name="description" content="Post the room you have and the room you want. RoomSwap finds 2-way and 3-way swaps between students and sends them to the warden for approval.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">🔄</span>
+    <div><b>RoomSwap</b><small>Hostel room-change board</small></div>
+  </div>
+  <nav class="roles" role="tablist" aria-label="Choose your role">
+    <button role="tab" class="tab" data-role="student" aria-selected="true">🎓 Student</button>
+    <button role="tab" class="tab" data-role="warden" aria-selected="false">🧑‍💼 Warden</button>
+  </nav>
+</header>
+
+<main>
+<noscript><p class="card">RoomSwap needs JavaScript to run. Please enable it.</p></noscript>
+
+<!-- ================= STUDENT ================= -->
+<section id="view-student" class="view">
+  <div id="signin" class="card">
+    <h2>Who are you?</h2>
+    <form id="signForm" class="fields two" autocomplete="off">
+      <label>Full name<input id="sName" required maxlength="60" placeholder="e.g. Rohan Mehta"></label>
+      <label>Roll number<input id="sRoll" required maxlength="20" placeholder="e.g. 2301CS045"></label>
+      <label>Hostel<select id="sHostel"></select></label>
+      <button class="btn primary" type="submit">Continue</button>
+    </form>
+    <div class="or"><span>or continue as</span></div>
+    <div class="inline">
+      <select id="signSel" aria-label="Continue as"></select>
+      <button class="btn ghost" id="signBtn" type="button">Continue</button>
+    </div>
+  </div>
+
+  <div id="dash" class="hide">
+    <div id="meCard"></div>
+
+    <div id="reqForm" class="card hide">
+      <h2>Post a room-change request</h2>
+      <form id="swapForm" autocomplete="off">
+        <h3 class="fh">The room you have now</h3>
+        <div class="fields two">
+          <label>Block<select id="cBlock"></select></label>
+          <label>Room number<input id="cNum" required inputmode="numeric" maxlength="3" pattern="[1-9][0-9]{2}" placeholder="e.g. 214"></label>
+          <label>Room type<select id="cType"><option>Non-AC</option><option>AC</option></select></label>
+          <label>Why do you want to move?<select id="cReason"></select></label>
+        </div>
+        <h3 class="fh">What you would like instead</h3>
+        <p class="hint">Pick any mix. Leave blocks or floors empty to accept any. First digit of the room number is the floor (214 = floor 2).</p>
+        <fieldset class="grp"><legend>Block(s)</legend><div id="wBlocks" class="checks"></div></fieldset>
+        <fieldset class="grp"><legend>Floor(s)</legend><div id="wFloors" class="checks"></div></fieldset>
+        <div class="fields">
+          <label>Or one exact room (optional)<input id="wRoom" maxlength="6" placeholder="e.g. A-105"></label>
+          <label>Note for the warden (optional)<input id="cNote" maxlength="120" placeholder="e.g. Preparing for GATE, need a quiet floor"></label>
+        </div>
+        <p id="formErr" class="err hide" role="alert"></p>
+        <button class="btn primary wide" type="submit">Post request &amp; find swaps</button>
+      </form>
+    </div>
+
+    <div id="myReq"></div>
+    <div id="optionsBox" class="hide">
+      <h2 class="sec">Swap options for you</h2>
+      <div id="options" class="list"></div>
+    </div>
+    <h2 class="sec">Swap proposals</h2>
+    <div id="props" class="list"></div>
+  </div>
+</section>
+
+<!-- ================= WARDEN ================= -->
+<section id="view-warden" class="view hide">
+  <div id="wardenLock" class="card lockbox">
+    <h2>Warden login</h2>
+    <p>Enter the warden PIN to approve room changes.</p>
+    <form class="lock" id="lockForm">
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Warden PIN" required>
+      <button class="btn primary" type="submit">Unlock</button>
+    </form>
+    <p class="hint">Demo PIN: 8642</p>
+    <p id="lockErr" class="err hide" role="alert"></p>
+  </div>
+  <div id="wardenMain" class="hide">
+    <div class="stats">
+      <div class="stat"><b id="sOpen">0</b><span>Open requests</span></div>
+      <div class="stat"><b id="sFound">0</b><span>Swaps possible</span></div>
+      <div class="stat warn"><b id="sReady">0</b><span>Need approval</span></div>
+      <div class="stat"><b id="sDone">0</b><span>Rooms changed</span></div>
+    </div>
+    <h2 class="sec">Waiting for your approval</h2>
+    <div id="readyList" class="list"></div>
+    <div class="rowhead"><h2 class="sec">Room change log</h2><button class="btn ghost small" id="csvBtn" type="button">⬇ Download CSV</button></div>
+    <div id="logList" class="list"></div>
+    <h2 class="sec">All open requests</h2>
+    <div id="openList" class="list"></div>
+  </div>
+</section>
+</main>
+
+<div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+
+<footer>
+  <p>Requests are stored in this browser for the demo. For real use across students’ phones, connect the <code>Store</code> functions in <code>script.js</code> to Firebase or Supabase. A swap only happens after every student agrees <b>and</b> the warden approves.</p>
+  <p><button class="link" id="seedBtn" type="button">Load sample requests</button> · <button class="link" id="resetBtn" type="button">Clear all data</button></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
