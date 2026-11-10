@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClearanceTrack – No-dues, bonafide &amp; NOC tracker</title>
+<meta name="description" content="Apply once, track every department's approval live, and get a verifiable certificate. No more running between offices.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Mulish:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">📜</span>
+    <div><b>ClearanceTrack</b><small>No-dues, bonafide &amp; NOC tracker</small></div>
+  </div>
+  <nav class="roles" role="tablist" aria-label="Choose your role">
+    <button role="tab" class="tab" data-role="student" aria-selected="true">🎓 Student</button>
+    <button role="tab" class="tab" data-role="office" aria-selected="false">🏢 Office</button>
+    <button role="tab" class="tab" data-role="admin" aria-selected="false">📊 Admin</button>
+  </nav>
+</header>
+
+<main>
+<noscript><p class="card">ClearanceTrack needs JavaScript to run. Please enable it.</p></noscript>
+
+<!-- ================= STUDENT ================= -->
+<section id="view-student" class="view">
+  <div id="sSignin" class="card">
+    <h2>Who are you?</h2>
+    <form id="signForm" class="fields two" autocomplete="off">
+      <label>Full name<input id="sName" required maxlength="60" placeholder="e.g. Rohan Mehta"></label>
+      <label>Roll number<input id="sRoll" required maxlength="20" placeholder="e.g. 2301CS045"></label>
+      <label>Course / branch<input id="sCourse" required maxlength="40" placeholder="e.g. B.Tech CSE"></label>
+      <label>Year<select id="sYear"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+      <button class="btn primary" type="submit">Continue</button>
+    </form>
+    <div class="or"><span>or continue as</span></div>
+    <div class="inline">
+      <select id="sSel" aria-label="Continue as"></select>
+      <button class="btn ghost" id="sBtn" type="button">Continue</button>
+    </div>
+  </div>
+
+  <div id="sDash" class="hide">
+    <div id="sMe"></div>
+    <div class="card">
+      <h2>Apply for a certificate</h2>
+      <form id="reqForm" class="fields" autocomplete="off">
+        <label>What do you need?<select id="rType"></select></label>
+        <div id="rNeeds" class="needs"></div>
+        <label>Purpose / note <span id="purposeHint" class="opt">(optional)</span><input id="rPurpose" maxlength="140" placeholder="e.g. Internship at Acme Corp, 3 months"></label>
+        <p id="rErr" class="err hide" role="alert"></p>
+        <button class="btn primary" type="submit">Submit to all departments</button>
+      </form>
+    </div>
+    <h2 class="sec">My requests</h2>
+    <div id="myReqs" class="list"></div>
+  </div>
+
+  <div id="verifyCard" class="card">
+    <h2>Verify a certificate</h2>
+    <p class="hint">Employers and offices can check that a certificate number is genuine.</p>
+    <form id="verifyForm" class="inline">
+      <input id="vCode" placeholder="e.g. ND-2026-0001" maxlength="20" autocomplete="off" aria-label="Certificate number" required>
+      <button class="btn primary" type="submit">Verify</button>
+    </form>
+    <div id="vResult"></div>
+  </div>
+</section>
+
+<!-- ================= OFFICE ================= -->
+<section id="view-office" class="view hide">
+  <div id="oLock" class="card lockbox">
+    <h2>Department login</h2>
+    <p>Choose your department and enter its PIN.</p>
+    <form id="oLockForm" class="fields">
+      <select id="oDept" aria-label="Department"></select>
+      <input id="oPin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Department PIN" required>
+      <button class="btn primary" type="submit">Unlock</button>
+    </form>
+    <p class="hint">Demo PIN for every department: 1111</p>
+    <p id="oErr" class="err hide" role="alert"></p>
+  </div>
+  <div id="oMain" class="hide">
+    <div id="oHead" class="card me"></div>
+    <div id="oBanner"></div>
+    <div class="stats">
+      <div class="stat"><b id="osWait">0</b><span>Waiting for you</span></div>
+      <div class="stat warn"><b id="osLate">0</b><span>Past deadline</span></div>
+      <div class="stat"><b id="osAvg">–</b><span>Avg days to reply</span></div>
+    </div>
+    <div class="chips" role="tablist" aria-label="Filter">
+      <button class="chip-btn active" data-filter="pending">Waiting</button>
+      <button class="chip-btn" data-filter="blocked">Dues / rejected</button>
+      <button class="chip-btn" data-filter="done">Approved</button>
+    </div>
+    <input id="oSearch" class="search" type="search" placeholder="Search name or roll number…" aria-label="Search">
+    <div id="oList" class="list"></div>
+  </div>
+</section>
+
+<!-- ================= ADMIN ================= -->
+<section id="view-admin" class="view hide">
+  <div id="aLock" class="card lockbox">
+    <h2>Admin login</h2>
+    <p>Enter the registrar / admin PIN.</p>
+    <form class="lock" id="aLockForm">
+      <input id="aPin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Admin PIN" required>
+      <button class="btn primary" type="submit">Unlock</button>
+    </form>
+    <p class="hint">Demo PIN: 9999</p>
+    <p id="aErr" class="err hide" role="alert"></p>
+  </div>
+  <div id="aMain" class="hide">
+    <div class="stats four">
+      <div class="stat"><b id="asProg">0</b><span>In progress</span></div>
+      <div class="stat"><b id="asReady">0</b><span>Ready to issue</span></div>
+      <div class="stat"><b id="asIssued">0</b><span>Issued</span></div>
+      <div class="stat warn"><b id="asStuck">0</b><span>Past deadline</span></div>
+    </div>
+    <h2 class="sec">Ready to issue</h2>
+    <div id="aReady" class="list"></div>
+    <h2 class="sec">Where requests get stuck</h2>
+    <div id="aBott" class="card"></div>
+    <div class="rowhead"><h2 class="sec">Requests past the deadline</h2><button class="btn ghost small" id="csvBtn" type="button">⬇ Download all (CSV)</button></div>
+    <div id="aStuck" class="list"></div>
+  </div>
+</section>
+</main>
+
+<!-- certificate page (shown instead of the app, and printed) -->
+<section id="certPage" class="hide" aria-label="Certificate">
+  <div class="noprint certbar">
+    <button class="btn ghost" data-act="closecert" type="button">← Back</button>
+    <button class="btn primary" data-act="printcert" type="button">🖨 Print / Save as PDF</button>
+  </div>
+  <div id="certBody" class="cert"></div>
+</section>
+
+<div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+
+<footer>
+  <p>Data is stored in this browser for the demo. For real use across students, offices and admin, connect the <code>Store</code> functions in <code>script.js</code> to Firebase or Supabase, and use real logins instead of PINs.</p>
+  <p><button class="link" id="seedBtn" type="button">Load sample requests</button> · <button class="link" id="resetBtn" type="button">Clear all data</button></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

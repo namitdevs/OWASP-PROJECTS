@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FloorDuty – Fair hostel chore roster</title>
+<meta name="description" content="A fair, auto-rotating duty roster for your hostel floor or room. Swap duties, get reminders, and end the arguments about whose turn it is.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧹</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">🧹</span>
+    <div><b>FloorDuty</b><small id="floorTitle">Fair hostel chore roster</small></div>
+  </div>
+  <nav class="roles" role="tablist" aria-label="Choose your role">
+    <button role="tab" class="tab" data-role="member" aria-selected="true">🙋 Member</button>
+    <button role="tab" class="tab" data-role="captain" aria-selected="false">📋 Captain</button>
+  </nav>
+</header>
+
+<main>
+<noscript><p class="card">FloorDuty needs JavaScript to run. Please enable it.</p></noscript>
+
+<!-- ================= MEMBER ================= -->
+<section id="view-member" class="view">
+  <div id="mSignin" class="card">
+    <h2>Who are you?</h2>
+    <div class="inline">
+      <select id="mSel" aria-label="Choose your name"></select>
+      <button class="btn primary" id="mBtn" type="button">Continue</button>
+    </div>
+    <p id="noMembers" class="hint hide">No members yet. Your floor captain can add everyone in the Captain tab (demo PIN 2580), or load sample data at the bottom.</p>
+  </div>
+
+  <div id="mDash" class="hide">
+    <div id="mMe"></div>
+    <div id="todayBanner"></div>
+
+    <h2 class="sec">Today on the floor</h2>
+    <div id="todayAll" class="list"></div>
+
+    <h2 class="sec">My upcoming duties</h2>
+    <div id="myList" class="list"></div>
+
+    <h2 class="sec">Swap requests for me</h2>
+    <div id="swapBox" class="list"></div>
+
+    <h2 class="sec">Next 7 days</h2>
+    <div class="tablewrap" id="calWrap"></div>
+
+    <h2 class="sec">Fairness board</h2>
+    <div id="fairBoard" class="card"></div>
+  </div>
+</section>
+
+<!-- ================= CAPTAIN ================= -->
+<section id="view-captain" class="view hide">
+  <div id="captainLock" class="card lockbox">
+    <h2>Floor captain login</h2>
+    <p>Enter the captain PIN to manage members and duties.</p>
+    <form class="lock" id="lockForm">
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Captain PIN" required>
+      <button class="btn primary" type="submit">Unlock</button>
+    </form>
+    <p class="hint">Demo PIN: 2580</p>
+    <p id="lockErr" class="err hide" role="alert"></p>
+  </div>
+
+  <div id="captainMain" class="hide">
+    <div class="card">
+      <h2>Floor / room name</h2>
+      <form id="floorForm" class="inline">
+        <input id="floorName" maxlength="40" placeholder="e.g. Block B – 2nd Floor" aria-label="Floor name" required>
+        <button class="btn primary" type="submit">Save</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Members</h2>
+      <form id="memberForm" class="inline" autocomplete="off">
+        <input id="mName" required maxlength="40" placeholder="Name" aria-label="Member name">
+        <input id="mRoom" maxlength="12" placeholder="Room (optional)" aria-label="Room">
+        <button class="btn primary" type="submit">Add member</button>
+      </form>
+      <div id="memberList" class="list slim"></div>
+    </div>
+
+    <div class="card">
+      <h2>Away / on leave</h2>
+      <p class="hint">Someone away is skipped, and their duties in that window move to others automatically.</p>
+      <form id="awayForm" class="inline" autocomplete="off">
+        <select id="aMember" aria-label="Member"></select>
+        <input type="date" id="aFrom" required aria-label="Away from">
+        <input type="date" id="aTo" required aria-label="Away until">
+        <button class="btn primary" type="submit">Mark away</button>
+      </form>
+      <div id="awayList" class="list slim"></div>
+    </div>
+
+    <div class="card">
+      <h2>Duties</h2>
+      <form id="dutyForm" class="fields" autocomplete="off">
+        <div class="two">
+          <label>Duty name<input id="dName" required maxlength="40" placeholder="e.g. Clean washroom"></label>
+          <label>Icon<select id="dIcon"></select></label>
+        </div>
+        <div class="three">
+          <label>Effort<select id="dWeight"><option value="1">Easy (1 point)</option><option value="2">Medium (2 points)</option><option value="3">Hard (3 points)</option></select></label>
+          <label>How often<select id="dFreq"><option value="daily">Every day</option><option value="weekly">Once a week</option></select></label>
+          <label>Day (weekly only)<select id="dDay"></select></label>
+        </div>
+        <button class="btn primary" type="submit">Add duty</button>
+      </form>
+      <div id="dutyList" class="list slim"></div>
+    </div>
+
+    <div class="card">
+      <h2>Today’s check-off</h2>
+      <p class="hint">Mark what really happened. Missed duties don’t count toward your points, so they come back to you sooner.</p>
+      <div id="todayAdmin" class="list slim"></div>
+    </div>
+
+    <div class="rowhead">
+      <h2 class="sec">Roster · next 14 days</h2>
+      <div class="inline">
+        <button class="btn ghost small" id="regenBtn" type="button">↻ Rebuild upcoming</button>
+        <button class="btn primary small" id="printBtn" type="button">🖨 Print</button>
+      </div>
+    </div>
+    <div id="printSheet" class="tablewrap"></div>
+  </div>
+</section>
+</main>
+
+<div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+
+<footer>
+  <p>Data is stored in this browser for the demo. For real use across everyone’s phones, connect the <code>Store</code> functions in <code>script.js</code> to Firebase or Supabase.</p>
+  <p><button class="link" id="seedBtn" type="button">Load sample floor</button> · <button class="link" id="resetBtn" type="button">Clear all data</button></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
