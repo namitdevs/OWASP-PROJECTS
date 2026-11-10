@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoiseCutter | Cut Through the Noise</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- PDF text extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span>✂</span> NoiseCutter</div>
+
+    <p class="side-label">WORKSPACE</p>
+    <button class="nav active" data-page="analyzer">▦ Analyzer</button>
+    <button class="nav" data-page="history">◷ History</button>
+
+    <div class="sidebar-bottom">
+      <span class="live-dot"></span>
+      Your personal notice assistant
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">STUDENT PRODUCTIVITY ASSISTANT</p>
+        <h1 id="pageTitle">Noise Analyzer</h1>
+      </div>
+
+      <div class="top-right">
+        <span class="demo-badge">SMART EXTRACTOR</span>
+        <div class="avatar">N</div>
+      </div>
+    </header>
+
+    <!-- ANALYZER PAGE -->
+    <section id="analyzerPage" class="page">
+
+      <div class="hero">
+        <div>
+          <p class="eyebrow">LESS SCROLLING. MORE CLARITY.</p>
+          <h2>Too many messages?<br>Let's find what matters.</h2>
+          <p>Paste your class chat or upload a notice. Get the important information in seconds.</p>
+        </div>
+        <div class="hero-icon">✂</div>
+      </div>
+
+      <div class="workspace-grid">
+
+        <!-- INPUT PANEL -->
+        <div class="panel input-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">INPUT YOUR CONTENT</p>
+              <h3>What do you want to analyze?</h3>
+            </div>
+            <span class="tag">CHAT / PDF</span>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active" data-tab="text">Paste text</button>
+            <button class="tab" data-tab="pdf">Upload PDF</button>
+          </div>
+
+          <div id="textInputArea">
+            <label for="sourceText">Paste WhatsApp messages or circular text</label>
+            <textarea
+              id="sourceText"
+              placeholder="Paste your class group messages here...
+
+Example:
+Tomorrow's DBMS lecture is cancelled.
+The assignment submission deadline is 15 November.
+The OS lab has been shifted to Lab 204.
+Everyone must register for the workshop by Friday."
+            ></textarea>
+
+            <div class="input-footer">
+              <span id="charCount">0 characters</span>
+              <button id="clearButton" class="text-btn">Clear text</button>
+            </div>
+          </div>
+
+          <div id="pdfInputArea" class="hidden">
+            <div id="dropZone" class="drop-zone">
+              <div class="upload-icon">↑</div>
+              <h3>Drop your notice PDF here</h3>
+              <p>or click to browse your files</p>
+              <input type="file" id="pdfFile" accept=".pdf,application/pdf" hidden>
+              <button id="browseButton" class="outline-btn">Choose PDF</button>
+              <small>PDF files only · Text-based PDFs supported</small>
+            </div>
+            <div id="fileInfo" class="file-info hidden"></div>
+          </div>
+
+          <div class="analyze-footer">
+            <span>🔒 Content stays in this browser demo.</span>
+            <button id="analyzeButton" class="primary-btn">
+              ✨ Analyze content
+            </button>
+          </div>
+
+          <p id="inputError" class="error-message"></p>
+        </div>
+
+        <!-- QUICK GUIDE -->
+        <div class="panel guide-panel">
+          <p class="eyebrow">HOW IT WORKS</p>
+          <h3>From chaos to clarity</h3>
+
+          <div class="guide-step">
+            <div class="step-icon">📥</div>
+            <div>
+              <h4>1. Paste or upload</h4>
+              <p>Use class chats, faculty messages or official circulars.</p>
+            </div>
+          </div>
+
+          <div class="guide-step">
+            <div class="step-icon">🧠</div>
+            <div>
+              <h4>2. Extract information</h4>
+              <p>Identify dates, deadlines, venues and important actions.</p>
+            </div>
+          </div>
+
+          <div class="guide-step">
+            <div class="step-icon">✅</div>
+            <div>
+              <h4>3. Get your checklist</h4>
+              <p>See exactly what needs your attention.</p>
+            </div>
+          </div>
+
+          <div class="guide-tip">
+            <strong>Pro tip</strong>
+            <p>Paste the entire conversation instead of individual messages to retain context.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <section id="resultsSection" class="hidden">
+
+        <div class="results-heading">
+          <div>
+            <p class="eyebrow">YOUR CONTENT, SIMPLIFIED</p>
+            <h2>Here's what matters.</h2>
+            <p id="analysisMeta" class="muted"></p>
+          </div>
+          <button id="copyButton" class="outline-btn">▣ Copy summary</button>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-top">
+            <span class="summary-icon">✦</span>
+            <div>
+              <p class="eyebrow">QUICK SUMMARY</p>
+              <h3>In a nutshell</h3>
+            </div>
+          </div>
+          <p id="summaryText"></p>
+        </div>
+
+        <div class="result-stats">
+          <div class="mini-stat">
+            <span>📅</span>
+            <p>Deadlines</p>
+            <h3 id="deadlineCount">0</h3>
+          </div>
+          <div class="mini-stat">
+            <span>📍</span>
+            <p>Venue changes</p>
+            <h3 id="venueCount">0</h3>
+          </div>
+          <div class="mini-stat">
+            <span>🚫</span>
+            <p>Cancellations</p>
+            <h3 id="cancelCount">0</h3>
+          </div>
+          <div class="mini-stat">
+            <span>☑</span>
+            <p>Action items</p>
+            <h3 id="actionCount">0</h3>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">DON'T MISS THESE</p>
+                <h3>Important announcements</h3>
+              </div>
+            </div>
+            <div id="announcementList" class="announcement-list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">YOUR NEXT STEPS</p>
+                <h3>Action checklist</h3>
+              </div>
+              <span id="checkProgress" class="tag">0/0 done</span>
+            </div>
+            <div id="actionList" class="action-list"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">DETAILED BREAKDOWN</p>
+              <h3>Extracted information</h3>
+            </div>
+          </div>
+          <div id="detailList" class="detail-list"></div>
+        </div>
+
+        <div class="results-actions">
+          <button id="newAnalysisButton" class="primary-btn">＋ Analyze another</button>
+          <button id="saveAnalysisButton" class="outline-btn">♡ Save to history</button>
+        </div>
+
+      </section>
+    </section>
+
+    <!-- HISTORY PAGE -->
+    <section id="historyPage" class="page hidden">
+      <div class="section-intro">
+        <p class="eyebrow">YOUR PREVIOUS ANALYSES</p>
+        <h2>Analysis history</h2>
+        <p>Review summaries you have saved in this browser.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h3>Saved analyses</h3>
+          <button id="clearHistoryButton" class="text-btn">Clear history</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+      </div>
+    </section>
+
+    <footer>
+      NoiseCutter © 2026 · Cut through the noise, focus on what matters.
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

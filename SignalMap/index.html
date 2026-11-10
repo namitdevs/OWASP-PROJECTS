@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignalMap | Campus Network Monitor</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-icon">⌁</span> SignalMap</div>
+    <p class="side-label">WORKSPACE</p>
+    <button class="nav active" data-page="dashboard">▦ Dashboard</button>
+    <button class="nav" data-page="heatmap">◉ Signal Heatmap</button>
+    <button class="nav" data-page="reports">▤ Reports</button>
+    <div class="sidebar-bottom">
+      <div class="live-dot"></div>
+      <span>Campus network monitor</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CAMPUS CONNECTIVITY</p>
+        <h1 id="pageTitle">Network Dashboard</h1>
+      </div>
+      <div class="top-right">
+        <span class="live-status"><i></i> LIVE DEMO</span>
+        <div class="avatar">S</div>
+      </div>
+    </header>
+
+    <section id="dashboardPage" class="page">
+      <div class="welcome">
+        <div>
+          <p class="eyebrow">SIGNALMAP / STUDENT NETWORK</p>
+          <h2>How's your connection today?</h2>
+          <p>Run a quick test and help improve campus connectivity.</p>
+        </div>
+        <div class="welcome-icon">📶</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-icon">📍</span>
+          <p>Locations monitored</p>
+          <h2 id="locationCount">6</h2>
+          <small>Across campus</small>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">⚡</span>
+          <p>Average download</p>
+          <h2><span id="avgSpeed">--</span> <small>Mbps</small></h2>
+          <small>Based on submitted tests</small>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">🧪</span>
+          <p>Tests submitted</p>
+          <h2 id="testCount">0</h2>
+          <small>Crowdsourced measurements</small>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">⚠️</span>
+          <p>Weak locations</p>
+          <h2 id="weakCount">0</h2>
+          <small>Average below 10 Mbps</small>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="panel speed-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">CONNECTION CHECK</p>
+              <h3>Run a speed test</h3>
+            </div>
+            <span class="pill">ONE TAP</span>
+          </div>
+
+          <label for="locationSelect">Where are you on campus?</label>
+          <select id="locationSelect">
+            <option value="Hostel A">Hostel A</option>
+            <option value="Hostel B">Hostel B</option>
+            <option value="Central Library">Central Library</option>
+            <option value="Tan Audi">Tan Audi</option>
+            <option value="Academic Block">Academic Block</option>
+            <option value="Cafeteria">Cafeteria</option>
+          </select>
+
+          <div class="speed-circle">
+            <div>
+              <span id="speedValue">--</span>
+              <small>Mbps download</small>
+            </div>
+          </div>
+          <p id="testMessage" class="test-message">Select your location and start testing.</p>
+          <button id="testButton" class="primary-btn">▶ Start speed test</button>
+          <p class="privacy-note">Your result is stored locally in this demo. No personal details are required.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">CAMPUS INSIGHTS</p>
+              <h3>Best Wi-Fi spot</h3>
+            </div>
+            <span class="pill green">TOP SPOT</span>
+          </div>
+          <div class="best-spot">
+            <div class="best-icon">🏆</div>
+            <div>
+              <h2 id="bestLocation">Central Library</h2>
+              <p>Highest average download speed</p>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="speedChart"></canvas>
+          </div>
+          <p class="muted">Average download speed by campus location</p>
+        </div>
+      </div>
+
+      <div class="panel recent-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">CROWDSOURCED DATA</p>
+            <h3>Recent speed tests</h3>
+          </div>
+          <button class="text-btn" data-goto="heatmap">View heatmap →</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Location</th><th>Download</th><th>Upload</th><th>Ping</th><th>Signal</th><th>Time</th></tr>
+            </thead>
+            <tbody id="recentTests">
+              <tr><td colspan="6" class="empty">No tests yet. Be the first to contribute!</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="heatmapPage" class="page hidden">
+      <div class="section-intro">
+        <p class="eyebrow">CAMPUS COVERAGE</p>
+        <h2>Campus signal heatmap</h2>
+        <p>Explore network performance reported by students at different campus locations.</p>
+      </div>
+      <div class="legend">
+        <span><i class="excellent"></i> Excellent (50+ Mbps)</span>
+        <span><i class="good"></i> Good (20–49 Mbps)</span>
+        <span><i class="weak"></i> Weak (1–19 Mbps)</span>
+        <span><i class="none"></i> No data</span>
+      </div>
+      <div id="heatmapGrid" class="heatmap-grid"></div>
+      <p class="muted">Demo heatmap: locations are illustrative campus zones, not GPS or building-level measurements.</p>
+    </section>
+
+    <section id="reportsPage" class="page hidden">
+      <div class="section-intro">
+        <p class="eyebrow">ADMIN OVERVIEW</p>
+        <h2>Campus network report</h2>
+        <p>A summary of crowdsourced network performance for campus IT teams.</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><p>Total tests</p><h2 id="reportTests">0</h2></div>
+        <div class="stat-card"><p>Average download</p><h2 id="reportAvg">-- Mbps</h2></div>
+        <div class="stat-card"><p>Weak zones</p><h2 id="reportWeak">0</h2></div>
+        <div class="stat-card"><p>Best location</p><h2 class="small-stat" id="reportBest">--</h2></div>
+      </div>
+      <div class="panel report-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">NETWORK PERFORMANCE</p><h3>Location-wise overview</h3></div>
+          <button id="exportButton" class="primary-btn small-btn">↓ Export CSV</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Location</th><th>Tests</th><th>Avg. download</th><th>Avg. upload</th><th>Avg. ping</th><th>Status</th></tr></thead>
+            <tbody id="reportTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Admin note</h3>
+        <p class="muted">Use this report to identify locations that may need access-point inspection, network capacity upgrades or further testing. Measurements are crowdsourced and should be verified before maintenance decisions.</p>
+      </div>
+    </section>
+
+    <footer>SignalMap © 2026 · Built for better campus connectivity</footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BloodLink Campus | Donate. Connect. Save Lives.</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="brand"><span>♥</span> BloodLink</div>
+    <p class="side-label">MAIN MENU</p>
+    <button class="nav active" data-page="dashboard">▦ Dashboard</button>
+    <button class="nav" data-page="donors">♡ Donor Registry</button>
+    <button class="nav" data-page="requests">✚ Blood Requests</button>
+    <button class="nav" data-page="camps">▣ Camp Reminders</button>
+
+    <div class="sidebar-bottom">
+      <span class="online-dot"></span>
+      Campus Blood Network
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CAMPUS COMMUNITY NETWORK</p>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="top-right">
+        <span class="demo-badge">DEMO VERSION</span>
+        <div class="avatar">B</div>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section id="dashboardPage" class="page">
+
+      <div class="hero">
+        <div>
+          <p class="eyebrow">EVERY DONATION MATTERS</p>
+          <h2>One campus. One community.<br>Countless lives to support.</h2>
+          <p>Connect voluntary blood donors with people who need help.</p>
+          <button class="hero-btn" data-goto="requests">＋ Create blood request</button>
+        </div>
+        <div class="hero-symbol">♥</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon red">♡</div>
+          <p>Registered donors</p>
+          <h2 id="donorCount">0</h2>
+          <small>Adult voluntary donors</small>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon orange">✚</div>
+          <p>Blood requests</p>
+          <h2 id="requestCount">0</h2>
+          <small>Total requests recorded</small>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green">✓</div>
+          <p>Potential matches</p>
+          <h2 id="matchCount">0</h2>
+          <small>Based on exact blood group</small>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple">◷</div>
+          <p>Upcoming camps</p>
+          <h2 id="campCount">0</h2>
+          <small>Scheduled reminders</small>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">BLOOD GROUP DIRECTORY</p>
+              <h3>Donor availability</h3>
+            </div>
+            <button class="text-btn" data-goto="donors">View all →</button>
+          </div>
+
+          <div id="bloodGroupStats" class="blood-group-grid"></div>
+        </div>
+
+        <div class="panel emergency-panel">
+          <p class="eyebrow">NEED BLOOD URGENTLY?</p>
+          <h3>Raise an emergency request</h3>
+          <p>Find potential campus donors with the requested blood group.</p>
+          <div class="emergency-icon">🩸</div>
+          <button class="primary-btn full-btn" data-goto="requests">
+            Create emergency request
+          </button>
+          <small>For immediate medical emergencies, contact a hospital or blood bank directly.</small>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">LATEST ACTIVITY</p>
+            <h3>Recent blood requests</h3>
+          </div>
+          <button class="text-btn" data-goto="requests">View requests →</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient / Request</th>
+                <th>Blood group</th>
+                <th>Hospital</th>
+                <th>Urgency</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recentRequests"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- DONOR REGISTRY -->
+    <section id="donorsPage" class="page hidden">
+
+      <div class="section-intro">
+        <p class="eyebrow">VOLUNTARY DONATION NETWORK</p>
+        <h2>Campus donor registry</h2>
+        <p>Register as an adult voluntary donor or find potential donors by blood group.</p>
+      </div>
+
+      <div class="panel form-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">JOIN THE NETWORK</p>
+            <h3>Register as a donor</h3>
+          </div>
+          <span class="tag">18+ ONLY</span>
+        </div>
+
+        <form id="donorForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="donorName">Full name</label>
+              <input type="text" id="donorName" placeholder="Enter your name" maxlength="60" required>
+            </div>
+
+            <div class="field">
+              <label for="donorAge">Age</label>
+              <input type="number" id="donorAge" min="18" max="100" placeholder="18 or above" required>
+            </div>
+
+            <div class="field">
+              <label for="donorBlood">Blood group</label>
+              <select id="donorBlood" required>
+                <option value="">Select blood group</option>
+                <option>A+</option><option>A-</option>
+                <option>B+</option><option>B-</option>
+                <option>AB+</option><option>AB-</option>
+                <option>O+</option><option>O-</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="donorLocation">Campus location</label>
+              <select id="donorLocation" required>
+                <option value="">Select location</option>
+                <option>Hostel A</option>
+                <option>Hostel B</option>
+                <option>Hostel C</option>
+                <option>Hostel D</option>
+                <option>Academic Block</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="donorEmail">Email address</label>
+              <input type="email" id="donorEmail" placeholder="name@example.com" required>
+            </div>
+
+            <div class="field">
+              <label for="donorPhone">Phone number</label>
+              <input type="tel" id="donorPhone" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+            </div>
+
+            <div class="field full-field">
+              <label for="lastDonation">Last donation date (if known)</label>
+              <input type="date" id="lastDonation">
+              <small>Leave blank if unknown. A blank date does not mean you are eligible to donate.</small>
+            </div>
+          </div>
+
+          <label class="consent">
+            <input type="checkbox" id="donorConsent" required>
+            <span>I voluntarily agree to be listed in this demo donor registry and understand that actual donation eligibility must be confirmed by a blood bank.</span>
+          </label>
+
+          <button type="submit" class="primary-btn">＋ Register as donor</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">REGISTERED VOLUNTEERS</p>
+            <h3>Find potential donors</h3>
+          </div>
+          <select id="donorFilter" class="filter-select">
+            <option value="all">All blood groups</option>
+            <option>A+</option><option>A-</option>
+            <option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option>
+            <option>O+</option><option>O-</option>
+          </select>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Donor</th>
+                <th>Blood group</th>
+                <th>Location</th>
+                <th>Last donation</th>
+                <th>Cooldown tracker</th>
+              </tr>
+            </thead>
+            <tbody id="donorTable"></tbody>
+          </table>
+        </div>
+        <p class="privacy-note">Contact details are not displayed in the public directory.</p>
+      </div>
+    </section>
+
+    <!-- BLOOD REQUESTS -->
+    <section id="requestsPage" class="page hidden">
+
+      <div class="section-intro">
+        <p class="eyebrow">EMERGENCY SUPPORT</p>
+        <h2>Blood request centre</h2>
+        <p>Create a request and identify potential donors with the same blood group.</p>
+      </div>
+
+      <div class="panel form-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">NEW REQUEST</p>
+            <h3>Request blood assistance</h3>
+          </div>
+          <span class="tag urgent-tag">EMERGENCY SUPPORT</span>
+        </div>
+
+        <form id="requestForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="patientName">Patient / request name</label>
+              <input type="text" id="patientName" maxlength="60" placeholder="Enter name" required>
+            </div>
+
+            <div class="field">
+              <label for="requestBlood">Required blood group</label>
+              <select id="requestBlood" required>
+                <option value="">Select blood group</option>
+                <option>A+</option><option>A-</option>
+                <option>B+</option><option>B-</option>
+                <option>AB+</option><option>AB-</option>
+                <option>O+</option><option>O-</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="hospitalName">Hospital / blood bank</label>
+              <input type="text" id="hospitalName" maxlength="100" placeholder="Enter hospital name" required>
+            </div>
+
+            <div class="field">
+              <label for="unitsRequired">Units requested</label>
+              <input type="number" id="unitsRequired" min="1" max="20" value="1" required>
+            </div>
+
+            <div class="field">
+              <label for="requestUrgency">Priority</label>
+              <select id="requestUrgency" required>
+                <option value="Urgent">Urgent</option>
+                <option value="High">High</option>
+                <option value="Normal">Normal</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="requestContact">Requester contact</label>
+              <input type="tel" id="requestContact" pattern="[0-9]{10}" placeholder="10-digit mobile number" required>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-btn">＋ Submit blood request</button>
+        </form>
+      </div>
+
+      <div id="matchResult" class="panel match-panel hidden">
+        <p class="eyebrow">POTENTIAL DONOR MATCHES</p>
+        <h3 id="matchHeading">Matching donors</h3>
+        <p class="muted" id="matchDescription"></p>
+        <div id="matchList" class="match-list"></div>
+        <button id="broadcastButton" class="primary-btn full-btn">
+          📢 Simulate emergency broadcast
+        </button>
+        <p id="broadcastMessage" class="broadcast-message"></p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">REQUEST HISTORY</p>
+            <h3>All blood requests</h3>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Request</th>
+                <th>Blood group</th>
+                <th>Hospital</th>
+                <th>Units</th>
+                <th>Priority</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="requestTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAMP REMINDERS -->
+    <section id="campsPage" class="page hidden">
+
+      <div class="section-intro">
+        <p class="eyebrow">CAMPUS EVENTS</p>
+        <h2>Blood donation camp reminders</h2>
+        <p>Keep track of upcoming voluntary blood donation camps.</p>
+      </div>
+
+      <div class="panel form-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">SCHEDULE AN EVENT</p>
+            <h3>Add a camp reminder</h3>
+          </div>
+        </div>
+
+        <form id="campForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="campName">Camp name</label>
+              <input type="text" id="campName" maxlength="80" placeholder="Campus Blood Donation Camp" required>
+            </div>
+
+            <div class="field">
+              <label for="campDate">Date</label>
+              <input type="date" id="campDate" required>
+            </div>
+
+            <div class="field">
+              <label for="campTime">Time</label>
+              <input type="time" id="campTime" required>
+            </div>
+
+            <div class="field">
+              <label for="campVenue">Venue</label>
+              <input type="text" id="campVenue" maxlength="100" placeholder="Campus auditorium" required>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-btn">＋ Add camp reminder</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">UPCOMING EVENTS</p>
+            <h3>Scheduled camps</h3>
+          </div>
+        </div>
+        <div id="campList" class="camp-list"></div>
+      </div>
+    </section>
+
+    <footer>
+      BloodLink Campus © 2026 · A voluntary donor coordination prototype
+      <p>In an emergency, contact a hospital or licensed blood bank directly.</p>
+    </footer>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
